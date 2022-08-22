@@ -12,12 +12,32 @@ var formSubmitHandler = function(event) {
 	
 	if (username) {
 		getUserRepos(username);
+		// clear out old
 		nameInputEl.value = "";
 	} else {
 		alert("Please enter a GitHub username");
 	}
-	console.log(event);
 };
+
+var getUserRepos = function(user) {
+	// format the github api url
+	var apiUrl = "https://api.github.com/users/" + user + "/repos";
+	
+	// make a request to the url
+	fetch(apiUrl).then(function(response) {
+		// request was successful
+		if (response.ok) {
+			response.json().then(function(data) {
+				displayRepos(data, user);
+			});
+		} else {
+			alert("Error: GitHub User Not Found");
+		}
+		}).catch(function(error) {
+			// Notice this '.catch()' getting chained onto the end of the '.then()' method
+			alert("Unable to connect to GitHub");
+		});
+};	
 
 var displayRepos = function(repos, searchTerm) {
 	// check if api returned any repos
@@ -64,30 +84,8 @@ var displayRepos = function(repos, searchTerm) {
 		// append container to the dom
 		repoContainerEl.appendChild(repoEl);
 	}
-
-	console.log(repos);
-	console.log(searchTerm);
-	console.log(repoName);
 };
 
-var getUserRepos = function(user) {
-	// format the github api url
-	var apiUrl = "https://api.github.com/users/" + user + "/repos";
-	
-	// make a request to the url
-	fetch(apiUrl).then(function(response) {
-		// request was successful
-		if (response.ok) {
-			response.json().then(function(data) {
-				displayRepos(data, user);
-			});
-		} else {
-			alert("Error: GitHub User Not Found");
-		}
-	}).catch(function(error) {
-		// Notice this '.catch()' getting chained onto the end of the '.then()' method
-		alert("Unable to connect to GitHub");
-	});
-};	
+
 
 userFormEl.addEventListener("submit", formSubmitHandler);
